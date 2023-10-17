@@ -115,7 +115,7 @@ public class DqRuleInputEntry implements Serializable {
     /**
      * values map
      */
-    @TableField(exist = false)
+    @TableField(exist = false, value = "index_values")
     private Integer index;
     /**
      * create_time

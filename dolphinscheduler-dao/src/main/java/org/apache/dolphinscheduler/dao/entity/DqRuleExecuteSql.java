@@ -41,7 +41,7 @@ public class DqRuleExecuteSql implements Serializable {
     /**
      * index，ensure the execution order of sql
      */
-    @TableField(value = "index")
+    @TableField(value = "index_sql")
     private int index;
     /**
      * SQL Statement

@@ -32,7 +32,7 @@ public interface PluginDefineMapper extends BaseMapper<PluginDefine> {
      *
      * @return boolean
      */
-    int checkTableExist();
+    List<Integer> checkTableExist();
 
     /**
      * query all plugin define

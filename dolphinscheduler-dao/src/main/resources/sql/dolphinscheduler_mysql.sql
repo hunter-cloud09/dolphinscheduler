@@ -268,6 +268,10 @@ CREATE TABLE `t_ds_access_token` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+INSERT INTO T_DS_ACCESS_TOKEN
+(USER_ID, TOKEN, EXPIRE_TIME, CREATE_TIME, UPDATE_TIME)
+VALUES(1, md5(concat(concat(1,date_add(now(),interval 100 year)) ,unix_timestamp(now()))), date_add(now(),interval 100 year), current_timestamp, current_timestamp);
+
 -- ----------------------------
 -- Records of t_ds_access_token
 -- ----------------------------
@@ -893,6 +897,10 @@ CREATE TABLE `t_ds_tenant` (
   UNIQUE KEY `unique_tenant_code`(`tenant_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+INSERT ignore INTO T_DS_TENANT
+(TENANT_CODE, DESCRIPTION, QUEUE_ID, CREATE_TIME, UPDATE_TIME)
+VALUES('dolphinscheduler', '', 1, now(), now());
+
 -- ----------------------------
 -- Records of t_ds_tenant
 -- ----------------------------
@@ -994,7 +1002,7 @@ VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', 
 -- Records of t_ds_user
 -- ----------------------------
 INSERT IGNORE INTO `t_ds_user`
-VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', current_timestamp, current_timestamp, null, 1, null);
+VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', current_timestamp, current_timestamp, null, 1, 'Asia/Shanghai');
 
 -- ----------------------------
 -- Table structure for t_ds_plugin_define
@@ -1026,6 +1034,11 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT IGNORE INTO t_ds_alert_plugin_instance
+(plugin_define_id, plugin_instance_params, create_time, update_time, instance_name)
+VALUES(1,'{"headerParams":"{\\"Content-Type\\": \\"application/json\\"}","requestType":"POST","WarningType":"failure","bodyParams":"{}","url":"http://192.168.90.130/integration/api/alarm","contentField":"contentField"}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'das-test');
+
+
 --
 -- Table structure for table `t_ds_dq_comparison_type`
 --
@@ -1038,7 +1051,7 @@ CREATE TABLE `t_ds_dq_comparison_type` (
     `name` varchar(100) DEFAULT NULL,
     `create_time` datetime DEFAULT NULL,
     `update_time` datetime DEFAULT NULL,
-    `is_inner_source` tinyint(1) DEFAULT '0',
+    `is_inner_source` tinyint DEFAULT '0',
     PRIMARY KEY (`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1144,7 +1157,7 @@ VALUES(10, '$t(table_count_check)', 0, 1, current_timestamp, current_timestamp);
 DROP TABLE IF EXISTS `t_ds_dq_rule_execute_sql`;
 CREATE TABLE `t_ds_dq_rule_execute_sql` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
-    `index` int(11) DEFAULT NULL,
+    `index_sql` int(11) DEFAULT NULL,
     `sql` text DEFAULT NULL,
     `table_alias` varchar(255) DEFAULT NULL,
     `type` int(11) DEFAULT NULL,
@@ -1155,55 +1168,55 @@ CREATE TABLE `t_ds_dq_rule_execute_sql` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(1, 1, 'SELECT COUNT(*) AS nulls FROM null_items', 'null_count', 1, false, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(2, 1, 'SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})', 'total_count', 2, false, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(3, 1, 'SELECT COUNT(*) AS miss from miss_items', 'miss_count', 1, false, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(4, 1, 'SELECT COUNT(*) AS valids FROM invalid_length_items', 'invalid_length_count', 1, false, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(5, 1, 'SELECT COUNT(*) AS total FROM ${target_table} WHERE (${target_filter})', 'total_count', 2, false, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(6, 1, 'SELECT ${src_field} FROM ${src_table} group by ${src_field} having count(*) > 1', 'duplicate_items', 0, true, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(7, 1, 'SELECT COUNT(*) AS duplicates FROM duplicate_items', 'duplicate_count', 1, false, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(8, 1, 'SELECT ${src_table}.* FROM (SELECT * FROM ${src_table} WHERE (${src_filter})) ${src_table} LEFT JOIN (SELECT * FROM ${target_table} WHERE (${target_filter})) ${target_table} ON ${on_clause} WHERE ${where_clause}', 'miss_items', 0, true, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(9, 1, 'SELECT * FROM ${src_table} WHERE (${src_field} not regexp ''${regexp_pattern}'') AND (${src_filter}) ', 'regexp_items', 0, true, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(10, 1, 'SELECT COUNT(*) AS regexps FROM regexp_items', 'regexp_count', 1, false, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(11, 1, 'SELECT * FROM ${src_table} WHERE (to_unix_timestamp(${src_field}, ''${datetime_format}'')-to_unix_timestamp(''${deadline}'', ''${datetime_format}'') <= 0) AND (to_unix_timestamp(${src_field}, ''${datetime_format}'')-to_unix_timestamp(''${begin_time}'', ''${datetime_format}'') >= 0) AND (${src_filter}) ', 'timeliness_items', 0, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(12, 1, 'SELECT COUNT(*) AS timeliness FROM timeliness_items', 'timeliness_count', 1, false, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(13, 1, 'SELECT * FROM ${src_table} where (${src_field} not in ( ${enum_list} ) or ${src_field} is null) AND (${src_filter}) ', 'enum_items', 0, true, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(14, 1, 'SELECT COUNT(*) AS enums FROM enum_items', 'enum_count', 1, false, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(15, 1, 'SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})', 'table_count', 1, false, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(16, 1, 'SELECT * FROM ${src_table} WHERE (${src_field} is null or ${src_field} = '''') AND (${src_filter})', 'null_items', 0, true, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
-(`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
+(`id`, `index_sql`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(17, 1, 'SELECT * FROM ${src_table} WHERE (length(${src_field}) ${logic_operator} ${field_length}) AND (${src_filter})', 'invalid_length_items', 0, true, current_timestamp, current_timestamp);
 
 --
@@ -1404,404 +1417,404 @@ CREATE TABLE `t_ds_relation_rule_input_entry` (
     `rule_id` int(11) DEFAULT NULL,
     `rule_input_entry_id` int(11) DEFAULT NULL,
     `values_map` text DEFAULT NULL,
-    `index` int(11) DEFAULT NULL,
+    `index_values` int(11) DEFAULT NULL,
     `create_time` datetime DEFAULT NULL,
     `update_time` datetime DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(1, 1, 1, NULL, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(2, 1, 2, NULL, 2, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(3, 1, 3, NULL, 3, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(4, 1, 4, NULL, 4, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(5, 1, 5, NULL, 5, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(6, 1, 6, '{"statistics_name":"null_count.nulls"}', 6, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(7, 1, 7, NULL, 7, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(8, 1, 8, NULL, 8, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(9, 1, 9, NULL, 9, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(10, 1, 10, NULL, 10, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(11, 1, 17, '', 11, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(12, 1, 19, NULL, 12, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(13, 2, 1, NULL, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(14, 2, 2, NULL, 2, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(15, 2, 3, NULL, 3, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(16, 2, 6, '{"is_show":"true","can_edit":"true"}', 4, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(17, 2, 16, NULL, 5, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(18, 2, 4, NULL, 6, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(19, 2, 7, NULL, 7, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(20, 2, 8, NULL, 8, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(21, 2, 9, NULL, 9, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(22, 2, 10, NULL, 10, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(24, 2, 19, NULL, 12, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(25, 3, 1, NULL, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(26, 3, 2, NULL, 2, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(27, 3, 3, NULL, 3, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(28, 3, 4, NULL, 4, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(29, 3, 11, NULL, 5, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(30, 3, 12, NULL, 6, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(31, 3, 13, NULL, 7, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(32, 3, 14, NULL, 8, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(33, 3, 15, NULL, 9, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(34, 3, 7, NULL, 10, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(35, 3, 8, NULL, 11, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(36, 3, 9, NULL, 12, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(37, 3, 10, NULL, 13, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(38, 3, 17, '{"comparison_name":"total_count.total"}', 14, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(39, 3, 19, NULL, 15, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(40, 4, 1, NULL, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(41, 4, 2, NULL, 2, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(42, 4, 3, NULL, 3, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(43, 4, 6, '{"is_show":"true","can_edit":"true"}', 4, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(44, 4, 16, NULL, 5, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(45, 4, 11, NULL, 6, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(46, 4, 12, NULL, 7, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(47, 4, 13, NULL, 8, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(48, 4, 17, '{"is_show":"true","can_edit":"true"}', 9, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(49, 4, 18, NULL, 10, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(50, 4, 7, NULL, 11, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(51, 4, 8, NULL, 12, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(52, 4, 9, NULL, 13, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(53, 4, 10, NULL, 14, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(62, 3, 6, '{"statistics_name":"miss_count.miss"}', 18, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(63, 5, 1, NULL, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(64, 5, 2, NULL, 2, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(65, 5, 3, NULL, 3, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(66, 5, 4, NULL, 4, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(67, 5, 5, NULL, 5, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(68, 5, 6, '{"statistics_name":"invalid_length_count.valids"}', 6, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(69, 5, 24, NULL, 7, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(70, 5, 23, NULL, 8, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(71, 5, 7, NULL, 9, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(72, 5, 8, NULL, 10, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(73, 5, 9, NULL, 11, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(74, 5, 10, NULL, 12, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(75, 5, 17, '', 13, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(76, 5, 19, NULL, 14, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(79, 6, 1, NULL, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(80, 6, 2, NULL, 2, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(81, 6, 3, NULL, 3, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(82, 6, 4, NULL, 4, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(83, 6, 5, NULL, 5, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(84, 6, 6, '{"statistics_name":"duplicate_count.duplicates"}', 6, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(85, 6, 7, NULL, 7, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(86, 6, 8, NULL, 8, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(87, 6, 9, NULL, 9, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(88, 6, 10, NULL, 10, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(89, 6, 17, '', 11, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(90, 6, 19, NULL, 12, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(93, 7, 1, NULL, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(94, 7, 2, NULL, 2, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(95, 7, 3, NULL, 3, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(96, 7, 4, NULL, 4, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(97, 7, 5, NULL, 5, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(98, 7, 6, '{"statistics_name":"regexp_count.regexps"}', 6, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(99, 7, 25, NULL, 5, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(100, 7, 7, NULL, 7, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(101, 7, 8, NULL, 8, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(102, 7, 9, NULL, 9, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(103, 7, 10, NULL, 10, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(104, 7, 17, NULL, 11, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(105, 7, 19, NULL, 12, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(108, 8, 1, NULL, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(109, 8, 2, NULL, 2, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(110, 8, 3, NULL, 3, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(111, 8, 4, NULL, 4, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(112, 8, 5, NULL, 5, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(113, 8, 6, '{"statistics_name":"timeliness_count.timeliness"}', 6, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(114, 8, 26, NULL, 8, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(115, 8, 27, NULL, 9, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(116, 8, 7, NULL, 10, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(117, 8, 8, NULL, 11, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(118, 8, 9, NULL, 12, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(119, 8, 10, NULL, 13, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(120, 8, 17, NULL, 14, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(121, 8, 19, NULL, 15, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(124, 9, 1, NULL, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(125, 9, 2, NULL, 2, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(126, 9, 3, NULL, 3, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(127, 9, 4, NULL, 4, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(128, 9, 5, NULL, 5, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(129, 9, 6, '{"statistics_name":"enum_count.enums"}', 6, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(130, 9, 28, NULL, 7, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(131, 9, 7, NULL, 8, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(132, 9, 8, NULL, 9, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(133, 9, 9, NULL, 10, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(134, 9, 10, NULL, 11, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(135, 9, 17, NULL, 12, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(136, 9, 19, NULL, 13, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(139, 10, 1, NULL, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(140, 10, 2, NULL, 2, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(141, 10, 3, NULL, 3, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(142, 10, 4, NULL, 4, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(143, 10, 6, '{"statistics_name":"table_count.total"}', 6, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(144, 10, 7, NULL, 7, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(145, 10, 8, NULL, 8, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(146, 10, 9, NULL, 9, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(147, 10, 10, NULL, 10, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(148, 10, 17, NULL, 11, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(149, 10, 19, NULL, 12, current_timestamp, current_timestamp);
 INSERT IGNORE INTO t_ds_relation_rule_input_entry
-(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index_values`, `create_time`, `update_time`)
 VALUES(150, 8, 29, NULL, 7, current_timestamp, current_timestamp);
 
 -- ----------------------------

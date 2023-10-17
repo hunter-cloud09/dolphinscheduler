@@ -17,7 +17,7 @@
 
 spring:
   jackson:
-    time-zone: UTC
+    time-zone: GMT+8
     date-format: "yyyy-MM-dd HH:mm:ss"
   banner:
     charset: UTF-8
@@ -34,12 +34,17 @@ spring:
       spec: maximumSize=100,expireAfterWrite=300s,recordStats
   sql:
     init:
-      schema-locations: classpath:sql/dolphinscheduler_h2.sql
+#      schema-locations: classpath:sql/dolphinscheduler_h2.sql
+      schema-locations: classpath:sql/dolphinscheduler_dm.sql
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:dolphinscheduler;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
-    username: sa
-    password: ""
+    driver-class-name: dm.jdbc.driver.DmDriver
+    url: jdbc:dm://192.168.90.111:5236/DOLPHIN
+    username: SYSDBA
+    password: SYSDBA001
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:mem:dolphinscheduler;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
+#    username: sa
+#    password: ""
   quartz:
     job-store-type: jdbc
     jdbc:
@@ -271,3 +276,16 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
     username: root
     password: root
+---
+spring:
+  config:
+    activate:
+      on-profile: dm
+  sql:
+    init:
+      schema-locations: classpath:sql/dolphinscheduler_dm.sql
+  datasource:
+    driver-class-name: dm.jdbc.driver.DmDriver
+    url: jdbc:dm://192.168.90.111:5236/DOLPHIN
+    username: SYSDBA
+    password: SYSDBA001

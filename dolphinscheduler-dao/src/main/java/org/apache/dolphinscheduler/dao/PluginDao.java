@@ -44,7 +44,11 @@ public class PluginDao {
      * @return boolean
      */
     public boolean checkPluginDefineTableExist() {
-        return pluginDefineMapper.checkTableExist() > 0;
+        try {
+            return !pluginDefineMapper.checkTableExist().isEmpty();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
